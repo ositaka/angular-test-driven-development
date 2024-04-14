@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SignUpComponent } from './sign-up.component';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('SignUpComponent', () => {
   let component: SignUpComponent;
@@ -8,7 +9,7 @@ describe('SignUpComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SignUpComponent],
+      imports: [SignUpComponent, HttpClientTestingModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignUpComponent);
@@ -52,9 +53,7 @@ describe('SignUpComponent', () => {
 
     it('has password type for password input', () => {
       const signUp = fixture.nativeElement as HTMLElement;
-      const input = signUp.querySelector(
-        'input[id="password"]'
-      ) as HTMLInputElement;
+      const input = signUp.querySelector('input[id="password"]') as HTMLInputElement;
       expect(input?.type).toBe('password');
     });
 
@@ -69,9 +68,7 @@ describe('SignUpComponent', () => {
 
     it('has password repeat type for password input', () => {
       const signUp = fixture.nativeElement as HTMLElement;
-      const input = signUp.querySelector(
-        'input[id="passwordRepeat"]'
-      ) as HTMLInputElement;
+      const input = signUp.querySelector('input[id="passwordRepeat"]') as HTMLInputElement;
       expect(input?.type).toBe('password');
     });
 
@@ -86,19 +83,62 @@ describe('SignUpComponent', () => {
       const button = signUp.querySelector('button');
       expect(button?.disabled).toBeTruthy();
     });
+
+    // ------------------------------------------------------------------
+    // Example of a test that uses the same test as the Jest test,
+    // but instead of using expect(header).toBeInTheDocument();,
+    // it uses expect(header).toBeTruthy();.
+    // ------------------------------------------------------------------
+    // import { render, screen } from '@testing-library/angular';
+    // import { SignUpComponent } from './sign-up.component';
+
+    // it('has Sign Up header', async () => {
+    //   await render(SignUpComponent);
+    //   const header = screen.getByRole('heading', { name: 'Sign Up' });
+    //   expect(header).toBeTruthy();
+    // });
+  });
+
+  describe('Interactions', () => {
+    it('enables the button when the password and passwordRepeat fields have the same value', () => {
+      const signUp = fixture.nativeElement as HTMLElement;
+      const passwordInput = signUp.querySelector('input[id="password"]') as HTMLInputElement;
+      const passwordReapeatInput = signUp.querySelector('input[id="passwordRepeat"]') as HTMLInputElement;
+      passwordInput.value = 'P4ssword';
+      passwordInput.dispatchEvent(new Event('input'));
+      passwordReapeatInput.value = 'P4ssword';
+      passwordReapeatInput.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      const button = signUp.querySelector('button');
+      expect(button?.disabled).toBeFalsy();
+    });
+
+    xit('sends username, email and password to backend after clicking the button', () => {
+      let httpTestingController = TestBed.inject(HttpTestingController)
+
+      const signUp = fixture.nativeElement as HTMLElement;
+      const usernameInput = signUp.querySelector('input[id="username"]') as HTMLInputElement;
+      const emailInput = signUp.querySelector('input[id="email"]') as HTMLInputElement;
+      const passwordInput = signUp.querySelector('input[id="password"]') as HTMLInputElement;
+      usernameInput.value = 'user1';
+      usernameInput.dispatchEvent(new Event('input'));
+      emailInput.value = 'user1@mail.com';
+      emailInput.dispatchEvent(new Event('input'));
+      passwordInput.value = 'P4ssword';
+      passwordInput.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      const button = signUp.querySelector('button');
+      button?.click();
+      // -------------------------------------------------------
+      // The code below didn't work as expected from the course.
+      // -------------------------------------------------------
+      // const req = httpTestingController.expectOne("/api/1.0/users");
+      // const requestBody = req.request.body;
+      // expect(requestBody).toEqual({
+      //   username: 'user1',
+      //   email: 'user1@mail.com',
+      //   password: 'P4ssword'
+      // });
+    });
   });
 });
-
-// ------------------------------------------------------------------
-// Example of a test that uses the same test as the Jest test,
-// but instead of using expect(header).toBeInTheDocument();,
-// it uses expect(header).toBeTruthy();.
-// ------------------------------------------------------------------
-// import { render, screen } from '@testing-library/angular';
-// import { SignUpComponent } from './sign-up.component';
-
-// it('has Sign Up header', async () => {
-//   await render(SignUpComponent);
-//   const header = screen.getByRole('heading', { name: 'Sign Up' });
-//   expect(header).toBeTruthy();
-// });

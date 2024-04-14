@@ -1,15 +1,17 @@
 <h1>Sign Up</h1>
 
-<label for="username">Username</label>
-<input id="username" />
+<form (submit)="onClickSignUp(); $event.preventDefault()">
+  <label for="username">Username</label>
+  <input id="username" (input)="onChageUsername($event)" />
 
-<label for="email">E-mail</label>
-<input id="email" />
+  <label for="email">E-mail</label>
+  <input id="email" (input)="onChageEmail($event)" />
 
-<label for="password">Password</label>
-<input id="password" type="password" />
+  <label for="password">Password</label>
+  <input id="password" type="password" (input)="onChagePassword($event)" />
 
-<label for="passwordRepeat">Password Repeat</label>
-<input id="passwordRepeat" type="password" />
+  <label for="passwordRepeat">Password Repeat</label>
+  <input id="passwordRepeat" type="password" (input)="onChagePasswordRepeat($event)" />
 
-<button disabled>Sign Up</button>
+  <button [disabled]="isDisabled()">Sign Up</button>
+</form>

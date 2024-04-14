@@ -2,13 +2,13 @@ import { render, screen, waitFor } from '@testing-library/angular';
 import { SignUpComponent } from './sign-up.component';
 import userEvent from '@testing-library/user-event';
 import "whatwg-fetch";
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
+import { HttpClientModule } from '@angular/common/http';
 
 const setup = async () => {
   await render(SignUpComponent, {
-    imports: [HttpClientTestingModule],
+    imports: [HttpClientModule],
   });
 }
 
@@ -79,8 +79,19 @@ describe('SignUpComponent', () => {
     });
 
     it('sends username, email and password to backend after clicking the button', async () => {
+      let requestBody;
+      const server = setupServer(
+        http.post('/api/1.0/users', async ({ request }) => {
+          requestBody = await request.formData()
+          return HttpResponse.json({
+            test: "tested"
+          })
+        })
+      );
+      server.listen();
+      console.log(requestBody, '---------------- requestBody');
+
       await setup();
-      let httpTestingController = TestBed.inject(HttpTestingController);
       const username = screen.getByLabelText('Username');
       const email = screen.getByLabelText('E-mail');
       const password = screen.getByLabelText('Password');
@@ -94,8 +105,6 @@ describe('SignUpComponent', () => {
       // -------------------------------------------------------
       // The code below didn't work as expected from the course.
       // -------------------------------------------------------
-      const req = httpTestingController.expectOne("/api/1.0/users");
-      const requestBody = req.request.body;
       expect(requestBody).toEqual({
         username: 'user1',
         email: 'user1@mail.com',

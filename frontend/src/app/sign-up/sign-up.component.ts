@@ -1,10 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { AlertComponent } from '../shared/alert/alert.component';
+import { ButtonComponent } from '../shared/button/button.component';
 
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [],
+  imports: [AlertComponent, ButtonComponent],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.css',
 })

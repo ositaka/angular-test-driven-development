@@ -1,0 +1,6 @@
+<button class="btn btn-primary" [disabled]="disabled || apiProgress">
+  @if (apiProgress) {
+  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+  }
+  <ng-content></ng-content>
+</button>

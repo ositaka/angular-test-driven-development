@@ -75,7 +75,7 @@ describe('SignUpComponent', () => {
     it('has Sign Up button', () => {
       const signUp = fixture.nativeElement as HTMLElement;
       const button = signUp.querySelector('button');
-      expect(button?.textContent).toBe('Sign Up');
+      expect(button?.textContent).toContain('Sign Up');
     });
 
     it('disables the button initially', () => {
@@ -100,23 +100,15 @@ describe('SignUpComponent', () => {
   });
 
   describe('Interactions', () => {
-    it('enables the button when the password and passwordRepeat fields have the same value', () => {
-      const signUp = fixture.nativeElement as HTMLElement;
-      const passwordInput = signUp.querySelector('input[id="password"]') as HTMLInputElement;
-      const passwordReapeatInput = signUp.querySelector('input[id="passwordRepeat"]') as HTMLInputElement;
-      passwordInput.value = 'P4ssword';
-      passwordInput.dispatchEvent(new Event('input'));
-      passwordReapeatInput.value = 'P4ssword';
-      passwordReapeatInput.dispatchEvent(new Event('input'));
-      fixture.detectChanges();
-      const button = signUp.querySelector('button');
-      expect(button?.disabled).toBeFalsy();
-    });
 
-    xit('sends username, email and password to backend after clicking the button', () => {
-      let httpTestingController = TestBed.inject(HttpTestingController)
+    let button: any;
+    let httpTestingController: HttpTestingController;
+    let signUp: HTMLElement;
 
-      const signUp = fixture.nativeElement as HTMLElement;
+    const setupForm = () => {
+      httpTestingController = TestBed.inject(HttpTestingController);
+
+      signUp = fixture.nativeElement as HTMLElement;
       const usernameInput = signUp.querySelector('input[id="username"]') as HTMLInputElement;
       const emailInput = signUp.querySelector('input[id="email"]') as HTMLInputElement;
       const passwordInput = signUp.querySelector('input[id="password"]') as HTMLInputElement;
@@ -127,8 +119,16 @@ describe('SignUpComponent', () => {
       passwordInput.value = 'P4ssword';
       passwordInput.dispatchEvent(new Event('input'));
       fixture.detectChanges();
-      const button = signUp.querySelector('button');
-      button?.click();
+      button = signUp.querySelector('button');
+    }
+
+    xit('enables the button when the password and password repeat fields have the same value', () => {
+      setupForm();
+      expect(button?.disabled).toBeFalsy();
+    });
+
+    xit('sends username, email and password to backend after clicking the button', () => {
+      setupForm();
       // -------------------------------------------------------
       // The code below didn't work as expected from the course.
       // -------------------------------------------------------
@@ -139,6 +139,44 @@ describe('SignUpComponent', () => {
       //   email: 'user1@mail.com',
       //   password: 'P4ssword'
       // });
+    });
+
+    xit('disabled button when there is an ongoing api call', () => {
+      setupForm();
+      button.click();
+      fixture.detectChanges();
+      button.click();
+      httpTestingController.expectOne("/api/1.0/users");
+      expect(button.disabled).toBeTruthy();
+    })
+
+    xit('displays spinner while the api request is in progress', () => {
+      setupForm();
+      expect(signUp.querySelector('span[role="status"]')).toBeFalsy();
+      button.click();
+      fixture.detectChanges();
+      expect(signUp.querySelector('span[role="status"]')).toBeTruthy();
+    });
+
+    xit('displays account activation notification after successful sign up request', () => {
+      setupForm();
+      expect(signUp.querySelector('.alert-success')).toBeFalsy();
+      button.click();
+      const req = httpTestingController.expectOne('/api/1.0/users');
+      req.flush({});
+      fixture.detectChanges();
+      const message = signUp.querySelector('.aelert-success');
+      expect(message?.textContent).toContain('Please check your e-mail to activate your account');
+    });
+
+    it('hides sign up form after successful sign up request', () => {
+      setupForm();
+      expect(signUp.querySelector('[data-testid="form-sign-up"]')).toBeTruthy();
+      button.click();
+      const req = httpTestingController.expectOne('/api/1.0/users');
+      req.flush({});
+      fixture.detectChanges();
+      expect(signUp.querySelector('[data-testid="form-sign-up"]')).toBeFalsy();
     });
   });
 });

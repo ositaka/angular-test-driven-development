@@ -13,6 +13,8 @@ export class SignUpComponent implements OnInit {
   email = '';
   password = '';
   passwordRepeat = '';
+  apiProgress = false;
+  singUpSuccess = false;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -35,28 +37,19 @@ export class SignUpComponent implements OnInit {
   }
 
   onClickSignUp() {
-    // fetch('/api/1.0/users', {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     username: this.username,
-    //     email: this.email,
-    //     password: this.password,
-    //   }),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    // });
-
+    this.apiProgress = true;
     this.httpClient
       .post('/api/1.0/users', {
         username: this.username,
         email: this.email,
         password: this.password,
       })
-      .subscribe();
+      .subscribe(() => {
+        this.singUpSuccess = true;
+      });
   }
 
-  isDisabled(): boolean {
+  isDisabled() {
     return this.password ? this.password !== this.passwordRepeat : true;
   }
 }

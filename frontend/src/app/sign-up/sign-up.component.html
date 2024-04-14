@@ -1,17 +1,46 @@
-<h1>Sign Up</h1>
+@if (!singUpSuccess) {
+<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+  <div class="card" data-testid="form-sign-up">
+    <div class="card-header text-center">
+      <h1>Sign Up</h1>
+    </div>
 
-<form (submit)="onClickSignUp(); $event.preventDefault()">
-  <label for="username">Username</label>
-  <input id="username" (input)="onChageUsername($event)" />
+    <form class="card-body" (submit)="onClickSignUp(); $event.preventDefault()">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input id="username" class="form-control" (input)="onChageUsername($event)" />
+      </div>
 
-  <label for="email">E-mail</label>
-  <input id="email" (input)="onChageEmail($event)" />
+      <div class="mb-3">
+        <label for="email" class="form-label">E-mail</label>
+        <input id="email" class="form-control" (input)="onChageEmail($event)" />
+      </div>
 
-  <label for="password">Password</label>
-  <input id="password" type="password" (input)="onChagePassword($event)" />
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" class="form-control" type="password" (input)="onChagePassword($event)" />
+      </div>
 
-  <label for="passwordRepeat">Password Repeat</label>
-  <input id="passwordRepeat" type="password" (input)="onChagePasswordRepeat($event)" />
+      <div class="mb-3">
+        <label for="passwordRepeat" class="form-label">Password Repeat</label>
+        <input id="passwordRepeat" class="form-control" type="password" (input)="onChagePasswordRepeat($event)" />
+      </div>
 
-  <button [disabled]="isDisabled()">Sign Up</button>
-</form>
+      <div class="text-center">
+        <button class="btn btn-primary" [disabled]="isDisabled() || apiProgress">
+          @if (apiProgress) {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          }
+          Sign Up
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+@else{
+<div class="alert alert-success">
+  Please check your e-mail to activate your account
+</div>
+}

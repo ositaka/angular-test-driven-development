@@ -2,39 +2,46 @@ import { Component, OnInit } from '@angular/core';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { ButtonComponent } from '../shared/button/button.component';
 import { UserService } from '../core/user.service';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [AlertComponent, ButtonComponent, FormsModule],
+  imports: [AlertComponent, ButtonComponent, ReactiveFormsModule],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.css',
 })
 export class SignUpComponent implements OnInit {
-  username = '';
-  email = '';
-  password = '';
-  passwordRepeat = '';
-  apiProgress = false;
-  signUpSuccess = false;
+
+  form = new FormGroup({
+    username: new FormControl(''),
+    email: new FormControl(''),
+    password: new FormControl(''),
+    passwordRepeat: new FormControl(''),
+  });
+
+  apiProgress = false
+  signUpSuccess = false
 
   constructor(private userSerivce: UserService) { }
 
   ngOnInit(): void { }
 
   onClickSignUp() {
+    const body = this.form.value;
+
+    delete body.passwordRepeat;
+
     this.apiProgress = true;
-    this.userSerivce.signUp({
-      username: this.username,
-      email: this.email,
-      password: this.password
-    }).subscribe(() => {
+    // @ts-ignore
+    this.userSerivce.signUp(body).subscribe(() => {
       this.signUpSuccess = true
     })
   }
 
   isDisabled() {
-    return this.password ? this.password !== this.passwordRepeat : true;
+    return this.form.get('password')?.value
+      ? this.form.get('password')?.value !== this.form.get('passwordRepeat')?.value
+      : true;
   }
 }

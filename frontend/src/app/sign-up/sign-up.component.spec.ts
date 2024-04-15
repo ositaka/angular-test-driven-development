@@ -184,4 +184,27 @@ describe('SignUpComponent', () => {
       expect(signUp.querySelector('[data-testid="form-sign-up"]')).toBeFalsy();
     });
   });
+
+  describe('Validation', () => {
+
+    const testCases = [
+      { field: 'username', value: '', error: 'Username is required' },
+      { field: 'username', value: '', error: 'Username must be at least 4 characters long' },
+    ]
+
+    testCases.forEach((field, value, error) => {
+      xit(`displays ${error} when ${field} has '${value}'`, async () => {
+        const signUp = fixture.nativeElement as HTMLElement;
+        expect(signUp.querySelector(`[data-testid="${field}-validation]`)).toBeNull();
+        const input = signUp.querySelector(`input[id="${field}"]`) as HTMLInputElement;
+        input.value = value as any;
+        input.dispatchEvent(new Event('input'));
+        input.dispatchEvent(new Event('blur'));
+        fixture.detectChanges();
+        const validationElement = signUp.querySelector(`[data-testid="${field}-validation]`);
+        expect(validationElement?.textContent).toContain(error);
+      });
+
+    });
+  });
 });

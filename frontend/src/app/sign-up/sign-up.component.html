@@ -8,29 +8,37 @@
     <form class="card-body" (ngSubmit)="onClickSignUp()" [formGroup]="form">
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
-        <input id="username" class="form-control" [ngClass]="usernameError ? ' is-invalid' : ''"
+        <input id="username" class="form-control" [ngClass]="usernameError ? 'is-invalid' : ''"
           formControlName="username" />
 
         @if (usernameError) {
         <div class="invalid-feedback" data-testid="username-validation">
-          @if (form.get('username')?.errors?.['required']) {
-          Username is required
-          }
-          @if (form.get('username')?.errors?.['minlength']) {
-          Username must be at least 4 characters long
-          }
+          {{ usernameError }}
         </div>
         }
       </div>
 
       <div class="mb-3">
         <label for="email" class="form-label">E-mail</label>
-        <input id="email" class="form-control" formControlName="email" />
+        <input id="email" class="form-control" [ngClass]="emailError ? 'is-invalid' : ''" formControlName="email" />
+
+        @if (emailError) {
+        <div class="invalid-feedback" data-testid="email-validation">
+          {{ emailError }}
+        </div>
+        }
       </div>
 
       <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input id="password" class="form-control" type="password" formControlName="password" />
+        <input id="password" class="form-control" type="password" [ngClass]="passwordError ? 'is-invalid' :''"
+          formControlName="password" />
+
+        @if (passwordError) {
+        <div class="invalid-feedback" data-testid="email-validation">
+          {{ passwordError }}
+        </div>
+        }
       </div>
 
       <div class="mb-3">

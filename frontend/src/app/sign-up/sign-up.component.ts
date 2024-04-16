@@ -16,8 +16,8 @@ export class SignUpComponent implements OnInit {
 
   form = new FormGroup({
     username: new FormControl('', [Validators.required, Validators.minLength(4)]),
-    email: new FormControl(''),
-    password: new FormControl(''),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)]),
     passwordRepeat: new FormControl(''),
   });
 
@@ -38,7 +38,32 @@ export class SignUpComponent implements OnInit {
         return 'Username must be at least 4 characters long'
       }
     }
+    return;
+  }
 
+  get emailError() {
+    const field = this.form.get('email');
+
+    if ((field?.errors && (field?.touched || field?.dirty))) {
+      if (field.errors['required']) {
+        return 'E-mail is required';
+      } else if (field.errors['email']) {
+        return "Invalid e-mail address";
+      }
+    }
+    return;
+  }
+
+  get passwordError() {
+    const field = this.form.get('password');
+
+    if ((field?.errors && (field?.touched || field?.dirty))) {
+      if (field.errors['required']) {
+        return 'Password is required';
+      } else if (field.errors['pattern']) {
+        return 'Password must have at least one uppercase, 1 lowercase letter and 1 number';
+      }
+    }
     return;
   }
 

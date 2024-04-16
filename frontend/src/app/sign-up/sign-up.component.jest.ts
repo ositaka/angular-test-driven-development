@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/angular';
 import { SignUpComponent } from './sign-up.component';
 import userEvent from '@testing-library/user-event';
-import "whatwg-fetch";
-import { http, HttpResponse } from "msw";
+import 'whatwg-fetch';
+import { http, HttpResponse } from 'msw';
 // import { setupServer } from "msw/node";
 import { HttpClientModule } from '@angular/common/http';
 
@@ -10,7 +10,7 @@ const setup = async () => {
   await render(SignUpComponent, {
     imports: [HttpClientModule],
   });
-}
+};
 
 describe('SignUpComponent', () => {
   describe('Layout', () => {
@@ -114,5 +114,30 @@ describe('SignUpComponent', () => {
     //     password: 'P4ssword'
     //   });
     // });
+  });
+
+  describe('Validation', () => {
+    it.each`
+      label         | inputValue              | message
+      ${'Username'} | ${'{sace}{backspace}'}  | ${'Username is required'}
+      ${'Username'} | ${'123'}                | ${'Username must be at least 4 characters long'}
+      ${'E-mail'}   | ${'{space}{backspace}'} | ${'E-mail is required'}
+      ${'E-mail'}   | ${'wrong-format'}       | ${'Invalid e-mail address'}
+      ${'Password'} | ${'{space}{backspace}'} | ${'Password is required'}
+      ${'Password'} | ${'password'}           | ${'Password must have at least one uppercase, 1 lowercase letter and 1 number'}
+      ${'Password'} | ${'passWORD'}           | ${'Password must have at least one uppercase, 1 lowercase letter and 1 number'}
+      ${'Password'} | ${'pass1234'}           | ${'Password must have at least one uppercase, 1 lowercase letter and 1 number'}
+      ${'Password'} | ${'PASS1234'}           | ${'Password must have at least one uppercase, 1 lowercase letter and 1 number'}
+    `(
+      'displays $message when $label has the value "$inputValud"',
+      async ({ label, inputValue, message }) => {
+        await setup();
+        expect(screen.queryByText(message)).not.toBeInTheDocument();
+        const input = screen.getByLabelText(label);
+        await userEvent.type(input, inputValue);
+        await userEvent.tab();
+        expect(screen.queryByText(message)).toBeInTheDocument();
+      }
+    );
   });
 });

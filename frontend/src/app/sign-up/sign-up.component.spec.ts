@@ -121,13 +121,14 @@ describe('SignUpComponent', () => {
       usernameInput.dispatchEvent(new Event('input'));
       emailInput.value = 'user1@mail.com';
       emailInput.dispatchEvent(new Event('input'));
+      emailInput.dispatchEvent(new Event('blur'));
       passwordInput.value = 'P4ssword';
       passwordInput.dispatchEvent(new Event('input'));
       fixture.detectChanges();
       button = signUp.querySelector('button');
     }
 
-    xit('enables the button when the password and password repeat fields have the same value', async () => {
+    xit('enables the button when all the fields have vaid input', async () => {
       await setupForm();
       expect(button?.disabled).toBeFalsy();
     });
@@ -183,6 +184,38 @@ describe('SignUpComponent', () => {
       fixture.detectChanges();
       expect(signUp.querySelector('[data-testid="form-sign-up"]')).toBeFalsy();
     });
+
+    xit('displays validation error coming from backend after submit failuer', async () => {
+      await setupForm();
+      button.click();
+      const req = httpTestingController.expectOne('/api/1.0/users');
+      req.flush({
+        validationErrors: {
+          email: 'E-mail in use'
+        }
+      }, {
+        status: 400,
+        statusText: "Bad Request"
+      });
+      fixture.detectChanges();
+      expect(signUp.querySelector('[data-testid="form-sign-up"]')).toBeFalsy();
+    });
+
+    it('hides spinner after sign up request fails', async () => {
+      await setupForm();
+      button.click();
+      const req = httpTestingController.expectOne('/api/1.0/users');
+      req.flush({
+        validationErrors: {
+          email: 'E-mail in use'
+        }
+      }, {
+        status: 400,
+        statusText: "Bad Request"
+      });
+      fixture.detectChanges();
+      expect(signUp.querySelector('span[role="status"]')).toBeFalsy();
+    });
   });
 
   describe('Validation', () => {
@@ -197,6 +230,7 @@ describe('SignUpComponent', () => {
       { field: 'password', value: 'passWORD', error: 'Password must have at least one uppercase, 1 lowercase letter and 1 number' },
       { field: 'password', value: 'pass1234', error: 'Password must have at least one uppercase, 1 lowercase letter and 1 number' },
       { field: 'password', value: 'PASS1234', error: 'Password must have at least one uppercase, 1 lowercase letter and 1 number' },
+      { field: 'passwordRepeat', value: 'pass', error: 'Password ismatch' },
     ]
 
     testCases.forEach((field, value, error) => {
@@ -210,6 +244,27 @@ describe('SignUpComponent', () => {
         fixture.detectChanges();
         const validationElement = signUp.querySelector(`[data-testid="${field}-validation]`);
         expect(validationElement?.textContent).toContain(error);
+      });
+
+      xit(`displays E-mail in use when email is not unique'`, async () => {
+        let httpTestingController = TestBed.inject(HttpTestingController);
+
+        const signUp = fixture.nativeElement as HTMLElement;
+        expect(signUp.querySelector(`[data-testid="email-validation]`)).toBeNull();
+        const input = signUp.querySelector(`input[id="email"]`) as HTMLInputElement;
+        input.value = "non-unique-email@mail.com";
+        input.dispatchEvent(new Event('input'));
+        input.dispatchEvent(new Event('blur'));
+        const request = httpTestingController.expectOne(({ url, method, body }) => {
+          if (url === "/api/1.0/users" && method === "POST") {
+            body.email === "non-unique-email@mail.com"
+          }
+          return false;
+        });
+        request.flush({});
+        fixture.detectChanges();
+        const validationElement = signUp.querySelector(`[data-testid="email-validation]`);
+        expect(validationElement?.textContent).toContain("E-mail in use");
       });
 
     });

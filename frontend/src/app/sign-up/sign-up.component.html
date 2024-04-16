@@ -35,7 +35,7 @@
           formControlName="password" />
 
         @if (passwordError) {
-        <div class="invalid-feedback" data-testid="email-validation">
+        <div class="invalid-feedback" data-testid="password-validation">
           {{ passwordError }}
         </div>
         }
@@ -43,7 +43,14 @@
 
       <div class="mb-3">
         <label for="passwordRepeat" class="form-label">Password Repeat</label>
-        <input id="passwordRepeat" class="form-control" type="password" formControlName="passwordRepeat" />
+        <input id="passwordRepeat" class="form-control" type="password"
+          [ngClass]="passwordRepeatError ? 'is-invalid': ''" formControlName="passwordRepeat" />
+
+        @if (passwordRepeatError) {
+        <div class="invalid-feedback" data-testid="passwordRepeat-validation">
+          {{ passwordRepeatError }}
+        </div>
+        }
       </div>
 
       <div class="text-center">

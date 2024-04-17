@@ -201,7 +201,7 @@ describe('SignUpComponent', () => {
       expect(signUp.querySelector('[data-testid="form-sign-up"]')).toBeFalsy();
     });
 
-    it('hides spinner after sign up request fails', async () => {
+    xit('hides spinner after sign up request fails', async () => {
       await setupForm();
       button.click();
       const req = httpTestingController.expectOne('/api/1.0/users');

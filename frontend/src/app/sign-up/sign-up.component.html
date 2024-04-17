@@ -1,68 +1,70 @@
-@if (!signUpSuccess) {
-<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-  <div class="card" data-testid="form-sign-up">
-    <div class="card-header text-center">
-      <h1>Sign Up</h1>
+<div data-testid="signup-page">
+  @if (!signUpSuccess) {
+  <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+    <div class="card" data-testid="form-sign-up">
+      <div class="card-header text-center">
+        <h1>Sign Up</h1>
+      </div>
+
+      <form class="card-body" (ngSubmit)="onClickSignUp()" [formGroup]="form">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input id="username" class="form-control" [ngClass]="usernameError ? 'is-invalid' : ''"
+            formControlName="username" />
+
+          @if (usernameError) {
+          <div class="invalid-feedback" data-testid="username-validation">
+            {{ usernameError }}
+          </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">E-mail</label>
+          <input id="email" class="form-control" [ngClass]="emailError ? 'is-invalid' : ''" formControlName="email" />
+
+          @if (emailError) {
+          <div class="invalid-feedback" data-testid="email-validation">
+            {{ emailError }}
+          </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input id="password" class="form-control" type="password" [ngClass]="passwordError ? 'is-invalid' :''"
+            formControlName="password" />
+
+          @if (passwordError) {
+          <div class="invalid-feedback" data-testid="password-validation">
+            {{ passwordError }}
+          </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="passwordRepeat" class="form-label">Password Repeat</label>
+          <input id="passwordRepeat" class="form-control" type="password"
+            [ngClass]="passwordRepeatError ? 'is-invalid': ''" formControlName="passwordRepeat" />
+
+          @if (passwordRepeatError) {
+          <div class="invalid-feedback" data-testid="passwordRepeat-validation">
+            {{ passwordRepeatError }}
+          </div>
+          }
+        </div>
+
+        <div class="text-center">
+          <app-button [disabled]="isDisabled()" [apiProgress]="apiProgress">Sign Up</app-button>
+        </div>
+      </form>
     </div>
-
-    <form class="card-body" (ngSubmit)="onClickSignUp()" [formGroup]="form">
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input id="username" class="form-control" [ngClass]="usernameError ? 'is-invalid' : ''"
-          formControlName="username" />
-
-        @if (usernameError) {
-        <div class="invalid-feedback" data-testid="username-validation">
-          {{ usernameError }}
-        </div>
-        }
-      </div>
-
-      <div class="mb-3">
-        <label for="email" class="form-label">E-mail</label>
-        <input id="email" class="form-control" [ngClass]="emailError ? 'is-invalid' : ''" formControlName="email" />
-
-        @if (emailError) {
-        <div class="invalid-feedback" data-testid="email-validation">
-          {{ emailError }}
-        </div>
-        }
-      </div>
-
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input id="password" class="form-control" type="password" [ngClass]="passwordError ? 'is-invalid' :''"
-          formControlName="password" />
-
-        @if (passwordError) {
-        <div class="invalid-feedback" data-testid="password-validation">
-          {{ passwordError }}
-        </div>
-        }
-      </div>
-
-      <div class="mb-3">
-        <label for="passwordRepeat" class="form-label">Password Repeat</label>
-        <input id="passwordRepeat" class="form-control" type="password"
-          [ngClass]="passwordRepeatError ? 'is-invalid': ''" formControlName="passwordRepeat" />
-
-        @if (passwordRepeatError) {
-        <div class="invalid-feedback" data-testid="passwordRepeat-validation">
-          {{ passwordRepeatError }}
-        </div>
-        }
-      </div>
-
-      <div class="text-center">
-        <app-button [disabled]="isDisabled()" [apiProgress]="apiProgress">Sign Up</app-button>
-      </div>
-    </form>
   </div>
-</div>
-}
+  }
 
-@else{
-<app-alert>
-  Please check your e-mail to activate your account
-</app-alert>
-}
+  @else{
+  <app-alert>
+    Please check your e-mail to activate your account
+  </app-alert>
+  }
+</div>

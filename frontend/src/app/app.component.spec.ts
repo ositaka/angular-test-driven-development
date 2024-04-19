@@ -1,14 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { Router, provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
-import { UserService } from './core/user.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let router: Router;
+
+  let appComponent: HTMLElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -25,31 +26,72 @@ describe('AppComponent', () => {
     router = TestBed.inject(Router);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    appComponent = fixture.nativeElement;
   });
 
   describe('Routing', () => {
-    it('displays homepage at /', async () => {
-      await router.navigate(['/']);
-      const page = fixture.nativeElement.querySelector('[data-testid="home-page"]');
-      expect(page).toBeTruthy();
+
+    const routingTests = [
+      { path: '/', pageId: 'home-page' },
+      { path: '/signup', pageId: 'sign-up-page' },
+      { path: '/login', pageId: 'login-page' },
+      { path: '/user/1', pageId: 'user-page' },
+      { path: '/user/2', pageId: 'user-page' },
+      { path: '/activate/123', pageId: 'activation-page' },
+      { path: '/activate/456', pageId: 'activation-page' },
+    ];
+
+    routingTests.forEach(({ path, pageId }) => {
+      it(`displays ${pageId} when path is ${path}`, async () => {
+        await router.navigate([`${path}`]);
+        const page = appComponent.querySelector(`[data-testid="${pageId}"]`);
+        expect(page).toBeTruthy();
+      });
     });
 
-    it('displays sign up page at /signup', async () => {
-      await router.navigate(['/signup']);
-      const page = fixture.nativeElement.querySelector('[data-testid="signup-page"]');
-      expect(page).toBeTruthy();
+    const linkTests = [
+      { path: '/', title: 'Home' },
+      // { path: '/signup', title: 'Sign Up' },
+      // { path: '/login', title: 'Login' },
+    ]
+
+    linkTests.forEach(({ path, title }) => {
+      it(`has link with title ${title} to ${path}`, () => {
+        const linkElement = appComponent.querySelector(`a[title="${title}"]`) as HTMLAnchorElement;
+        expect(linkElement.pathname).toEqual(path);
+      })
     });
 
-    it('displays login page at /login', async () => {
-      await router.navigate(['/login']);
-      const page = fixture.nativeElement.querySelector('[data-testid="login-page"]');
-      expect(page).toBeTruthy();
-    });
+    const navigationTests = [
+      {
+        initialPath: '/',
+        clickingTo: 'Sign Up',
+        visiblePage: 'sign-up-page',
+      },
+      {
+        initialPath: '/signup',
+        clickingTo: 'Home',
+        visiblePage: 'home-page',
+      },
+      {
+        initialPath: '/',
+        clickingTo: 'Login',
+        visiblePage: 'login-page',
+      },
+    ]
 
-    it('displays user page at /user', async () => {
-      await router.navigate(['/user']);
-      const page = fixture.nativeElement.querySelector('[data-testid="user-page"]');
-      expect(page).toBeTruthy();
+    navigationTests.forEach(({ initialPath, clickingTo, visiblePage }) => {
+      it(`displays ${visiblePage} after clicking ${clickingTo}link `, fakeAsync(
+        async () => {
+          await router.navigate([initialPath]);
+          const linkElement = appComponent.querySelector(`a[title="${clickingTo}"]`) as HTMLAnchorElement;
+          linkElement.click();
+          tick(); // equivatent to await
+          fixture.detectChanges();
+          const page = appComponent.querySelector(`[data-testid="${visiblePage}"]`);
+          expect(page).toBeTruthy();
+        }
+      ));
     });
   });
 });

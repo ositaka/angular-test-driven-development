@@ -1,4 +1,8 @@
 <div data-testid="activation-page">
+  @if (activationStatus === "inProgress"){
+  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+  }
+
   @if (activationStatus === "success"){
   <app-alert>Account is activated</app-alert>
   }

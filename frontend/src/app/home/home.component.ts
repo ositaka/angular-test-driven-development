@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, Subscriber, first, map } from 'rxjs';
+import { UserListComponent } from './user-list/user-list.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [UserListComponent],
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit {

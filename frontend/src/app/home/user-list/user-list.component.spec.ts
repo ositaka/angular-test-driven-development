@@ -6,27 +6,9 @@ import {
   HttpTestingController,
   TestRequest,
 } from '@angular/common/http/testing';
-
-export const getPage = (page: number, size: number) => {
-  let start = page * size;
-  let end = start + size;
-  return {
-    content: users.slice(start, end),
-    page,
-    size,
-    totalPages: Math.ceil(users.length / size),
-  }
-};
-
-const users = [
-  { id: 1, username: 'user1', email: 'user1@mail.com' },
-  { id: 2, username: 'user2', email: 'user2@mail.com' },
-  { id: 3, username: 'user3', email: 'user3@mail.com' },
-  { id: 4, username: 'user4', email: 'user4@mail.com' },
-  { id: 5, username: 'user5', email: 'user5@mail.com' },
-  { id: 6, username: 'user6', email: 'user6@mail.com' },
-  { id: 7, username: 'user7', email: 'user7@mail.com' },
-];
+import { getPage } from './test-helper';
+import { provideRouter, withHashLocation } from '@angular/router';
+import { routes } from '../../app.routes';
 
 const parsePagePramas = (request: TestRequest) => {
   let size = Number.parseInt(request.request.params.get('size')!);
@@ -53,6 +35,10 @@ describe('UserListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [UserListComponent, HttpClientTestingModule],
+      providers: [
+        provideRouter(routes),
+        withHashLocation(),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserListComponent);
@@ -126,4 +112,12 @@ describe('UserListComponent', () => {
     const previousPageRequest = httpTestingController.expectOne(() => true);
     expect(previousPageRequest.request.params.get('page')).toBe('0');
   });
+
+  it('displays spinner during the API call', () => {
+    const request = httpTestingController.expectOne(() => true);
+    expect(fixture.nativeElement.querySelector('span[role="status"]')).toBeTruthy();
+    request.flush(getPage(0, 3));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('span[role="status"]')).toBeFalsy();
+  })
 });

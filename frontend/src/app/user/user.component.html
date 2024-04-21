@@ -1,3 +1,12 @@
 <div data-testid="user-page">
-  <h1>User Page</h1>
+  @if (status === 'success'){
+  <app-profile-card [user]="user"></app-profile-card>
+  }
+  @if (status === 'fail'){
+  <app-alert type="danger">User not found</app-alert>
+  }
+
+  @if (status === "inProgress"){
+  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+  }
 </div>

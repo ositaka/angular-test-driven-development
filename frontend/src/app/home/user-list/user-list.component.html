@@ -5,17 +5,27 @@
 
   <ul class="list-group list-group-flush">
     @for (user of page.content; track user.id) {
-    <li class="list-group-item list-group-item-action">
-      {{user.username}}
+    <li class="list-group-item list-group-item-action" (click)="navigate(user.id)">
+      <app-user-list-item [user]="user"></app-user-list-item>
     </li>
     }
   </ul>
 
-  @if (hasPreviousPage){
-  <button (click)="loadData(page.page - 1)" data-testid="previous-button">&lt; previous</button>
-  }
+  <div class="card-footer text-center">
 
-  @if (hasNextPage){
-  <button (click)="loadData(page.page + 1)" data-testid="next-button">next &gt;</button>
-  }
+    @if (hasPreviousPage && !fetchingData){
+    <button (click)="loadData(page.page - 1)" data-testid="previous-button"
+      class="btn btn-outline-secondary btn-sm float-start">
+      &lt; previous
+    </button>
+    } @if (hasNextPage && !fetchingData){
+    <button (click)="loadData(page.page + 1)" data-testid="next-button"
+      class="btn btn-outline-secondary btn-sm float-end">
+      next &gt;
+    </button>
+    }
+    @if (fetchingData){
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    }
+  </div>
 </div>

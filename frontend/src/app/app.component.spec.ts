@@ -2,12 +2,15 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { AppComponent } from './app.component';
 import { Router, provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Location } from '@angular/common';
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let router: Router;
+  let httpTestingController: HttpTestingController;
+  let location: Location;
 
   let appComponent: HTMLElement;
 
@@ -24,6 +27,8 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     fixture = TestBed.createComponent(AppComponent);
     router = TestBed.inject(Router);
+    location = TestBed.inject(Location);
+    httpTestingController = TestBed.inject(HttpTestingController);
     component = fixture.componentInstance;
     fixture.detectChanges();
     appComponent = fixture.nativeElement;
@@ -93,5 +98,29 @@ describe('AppComponent', () => {
         }
       ));
     });
+
+
+    it('navigates to user page when clicking on username on user list', fakeAsync(
+      async () => {
+        await router.navigate(['/']);
+        fixture.detectChanges();
+        const request = httpTestingController.expectOne(() => true);
+        request.flush({
+          content: [
+            { id: 1, username: 'user1', email: 'user1@mail.com' }
+          ],
+          page: 0, size: 3, totalPages: 1
+        });
+        fixture.detectChanges();
+        const linkToUserPage = fixture.nativeElement.querySelector('.list-group-item');
+        linkToUserPage.click();
+        tick();
+        fixture.detectChanges();
+        const page = appComponent.querySelector(`[data-testid="user-page"]`);
+        expect(page).toBeTruthy();
+        expect(location.path()).toEqual('/user/1');
+      }
+    ));
+
   });
 });

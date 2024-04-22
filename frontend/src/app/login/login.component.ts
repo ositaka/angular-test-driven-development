@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, viewChild } from '@angular/core';
 import { ButtonComponent } from '../shared/button/button.component';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { UserService } from '../core/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AlertComponent } from '../shared/alert/alert.component';
+import { CommonModule, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ButtonComponent, FormsModule, AlertComponent],
+  imports: [ButtonComponent, FormsModule, AlertComponent, JsonPipe, CommonModule],
   templateUrl: './login.component.html',
   styles: ``
 })
@@ -36,5 +37,11 @@ export class LoginComponent {
         this.apiProgress = false;
       },
     });
+  }
+
+  isInvalid(field: FormControl) {
+    const { invalid, dirty, touched } = field;
+
+    return invalid && (dirty || touched);
   }
 }

@@ -9,7 +9,7 @@
         <div class="mb-3">
           <label for="email" class="form-label">E-mail</label>
           <input id="email" class="form-control" [(ngModel)]="email" name="email" required email #emailInput="ngModel"
-            [ngClass]="isInvalid(emailInput.control) ? 'is-invalid' : ''" />
+            [ngClass]="isInvalid(emailInput.control) ? 'is-invalid' : ''" (ngModelChange)="onChange()" />
 
           <div data-testid="email-validation" class="invalid-feedback">
             @if (isInvalid(emailInput.control)) {
@@ -26,7 +26,8 @@
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
           <input id="password" class="form-control" type="password" [(ngModel)]="password" name="password" required
-            #passwordInput="ngModel" [ngClass]="isInvalid(passwordInput.control) ? 'is-invalid' : ''" />
+            #passwordInput="ngModel" [ngClass]="isInvalid(passwordInput.control) ? 'is-invalid' : ''"
+            (ngModelChange)="onChange()" />
 
           <div data-testid="password-validation" class="invalid-feedback">
             @if (isInvalid(passwordInput.control)) {

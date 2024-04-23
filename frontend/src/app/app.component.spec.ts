@@ -123,4 +123,45 @@ describe('AppComponent', () => {
     ));
 
   });
+
+  describe('Login', () => {
+
+    let button: any;
+    let httpTestingController: HttpTestingController;
+    let loginPage: HTMLElement;
+    let emailInput: HTMLInputElement;
+    let passwordInput: HTMLInputElement;
+
+    const setupForm = async (email = "user1@mail.com") => {
+      httpTestingController = TestBed.inject(HttpTestingController);
+
+      loginPage = fixture.nativeElement as HTMLElement;
+
+      await fixture.whenStable();
+      emailInput = loginPage.querySelector('input[id="email"]') as HTMLInputElement;
+      passwordInput = loginPage.querySelector('input[id="password"]') as HTMLInputElement;
+      emailInput.value = email;
+      emailInput.dispatchEvent(new Event('input'));
+      emailInput.dispatchEvent(new Event('blur'));
+      passwordInput.value = 'P4ssword';
+      passwordInput.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      button = loginPage.querySelector('button');
+    }
+
+    it('navigates to home page after success login', fakeAsync(async () => {
+      await router.navigate(['/login']);
+      fixture.detectChanges();
+      await setupForm();
+      button.click();
+      const request = httpTestingController.expectOne(() => true);
+      request.flush({});
+      // this fixes the test, but better to use the fakeAsync
+      // await Promise.resolve();
+      const page = appComponent.querySelector(`[data-testid="home-page"]`);
+      expect(page).toBeTruthy();
+
+    }));
+
+  });
 });

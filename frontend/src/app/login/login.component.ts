@@ -5,6 +5,7 @@ import { UserService } from '../core/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { CommonModule, JsonPipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,7 @@ export class LoginComponent {
 
   apiProgress = false;
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private router: Router) { }
 
   isDisabled() {
     return !this.email || !this.password;
@@ -31,7 +32,9 @@ export class LoginComponent {
   onClickLogin() {
     this.apiProgress = true;
     this.userService.autheticate(this.email, this.password).subscribe({
-      next: () => { },
+      next: () => {
+        this.router.navigate(['/']);
+      },
       error: (err: HttpErrorResponse) => {
         this.error = err.error.message;
         this.apiProgress = false;
@@ -43,5 +46,9 @@ export class LoginComponent {
     const { invalid, dirty, touched } = field;
 
     return invalid && (dirty || touched);
+  }
+
+  onChange() {
+    this.error = '';
   }
 }

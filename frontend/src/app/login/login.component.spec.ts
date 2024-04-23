@@ -69,6 +69,8 @@ describe('LoginComponent', () => {
     let button: any;
     let httpTestingController: HttpTestingController;
     let loginPage: HTMLElement;
+    let emailInput: HTMLInputElement;
+    let passwordInput: HTMLInputElement;
 
     const setupForm = async (email = "user1@mail.com") => {
       httpTestingController = TestBed.inject(HttpTestingController);
@@ -76,8 +78,8 @@ describe('LoginComponent', () => {
       loginPage = fixture.nativeElement as HTMLElement;
 
       await fixture.whenStable();
-      const emailInput = loginPage.querySelector('input[id="email"]') as HTMLInputElement;
-      const passwordInput = loginPage.querySelector('input[id="password"]') as HTMLInputElement;
+      emailInput = loginPage.querySelector('input[id="email"]') as HTMLInputElement;
+      passwordInput = loginPage.querySelector('input[id="password"]') as HTMLInputElement;
       emailInput.value = email;
       emailInput.dispatchEvent(new Event('input'));
       emailInput.dispatchEvent(new Event('blur'));
@@ -153,6 +155,42 @@ describe('LoginComponent', () => {
       });
       fixture.detectChanges();
       expect(loginPage.querySelector('span[role="status"]')).toBeFalsy();
+    });
+
+    it('clears the error after email field is changed', async () => {
+      await setupForm();
+      button.click();
+      const req = httpTestingController.expectOne('/api/1.0/auth');
+      req.flush({
+        mesasage: 'Incorrect Credentials'
+      }, {
+        status: 401,
+        statusText: "Unauthorized"
+      });
+      fixture.detectChanges();
+      expect(loginPage.querySelector('span[role="status"]')).toBeFalsy();
+      emailInput.value = 'valid@mail.com';
+      emailInput.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      expect(loginPage.querySelector(`.alert`)).toBeFalsy();
+    });
+
+    it('clears the error after password field is changed', async () => {
+      await setupForm();
+      button.click();
+      const req = httpTestingController.expectOne('/api/1.0/auth');
+      req.flush({
+        mesasage: 'Incorrect Credentials'
+      }, {
+        status: 401,
+        statusText: "Unauthorized"
+      });
+      fixture.detectChanges();
+      expect(loginPage.querySelector('span[role="status"]')).toBeFalsy();
+      passwordInput.value = 'P4ssword2';
+      passwordInput.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      expect(loginPage.querySelector(`.alert`)).toBeFalsy();
     });
   });
 

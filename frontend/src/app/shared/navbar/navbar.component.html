@@ -4,12 +4,18 @@
       <img src="assets/hoaxify.png" width="60" alt="Hoaxify" /> Hoaxify
     </a>
     <ul class="navbar-nav">
+      @if (!authenticationService.loggedInUser.isLoggedIn){
       <li class="nav-link">
         <a routerLink="/signup" title="Sign Up">Sign Up</a>
       </li>
       <li class="nav-link">
         <a routerLink="/login" title="Login">Login</a>
       </li>
+      } @else {
+      <li class="nav-link">
+        <a [routerLink]="'/user/'+ authenticationService.loggedInUser.id" title="My Profile">My Profile</a>
+      </li>
+      }
     </ul>
   </div>
 </nav>

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { AuthenticationService } from '../../core/authentication.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,4 +11,7 @@ import { RouterModule } from '@angular/router';
 })
 export class NavbarComponent {
 
+  constructor(readonly authenticationService: AuthenticationService) {
+
+  }
 }

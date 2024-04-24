@@ -4,6 +4,7 @@ import { Router, provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Location } from '@angular/common';
+import { LoggedInUser } from './shared/types';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -14,7 +15,7 @@ describe('AppComponent', () => {
 
   let appComponent: HTMLElement;
 
-  beforeEach(async () => {
+  const setup = async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, HttpClientTestingModule],
       providers: [
@@ -22,9 +23,7 @@ describe('AppComponent', () => {
         withHashLocation(),
       ],
     }).compileComponents();
-  });
 
-  beforeEach(async () => {
     fixture = TestBed.createComponent(AppComponent);
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
@@ -32,6 +31,10 @@ describe('AppComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     appComponent = fixture.nativeElement;
+  };
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   describe('Routing', () => {
@@ -48,6 +51,7 @@ describe('AppComponent', () => {
 
     routingTests.forEach(({ path, pageId }) => {
       it(`displays ${pageId} when path is ${path}`, async () => {
+        await setup();
         await router.navigate([`${path}`]);
         const page = appComponent.querySelector(`[data-testid="${pageId}"]`);
         expect(page).toBeTruthy();
@@ -61,7 +65,8 @@ describe('AppComponent', () => {
     ]
 
     linkTests.forEach(({ path, title }) => {
-      it(`has link with title ${title} to ${path}`, () => {
+      it(`has link with title ${title} to ${path}`, async () => {
+        await setup();
         const linkElement = appComponent.querySelector(`a[title="${title}"]`) as HTMLAnchorElement;
         expect(linkElement.pathname).toEqual(path);
       })
@@ -88,6 +93,7 @@ describe('AppComponent', () => {
     navigationTests.forEach(({ initialPath, clickingTo, visiblePage }) => {
       it(`displays ${visiblePage} after clicking ${clickingTo}link `, fakeAsync(
         async () => {
+          await setup();
           await router.navigate([initialPath]);
           const linkElement = appComponent.querySelector(`a[title="${clickingTo}"]`) as HTMLAnchorElement;
           linkElement.click();
@@ -102,6 +108,7 @@ describe('AppComponent', () => {
 
     it('navigates to user page when clicking on username on user list', fakeAsync(
       async () => {
+        await setup();
         await router.navigate(['/']);
         fixture.detectChanges();
         const request = httpTestingController.expectOne(() => true);
@@ -133,6 +140,7 @@ describe('AppComponent', () => {
     let passwordInput: HTMLInputElement;
 
     const setupLogin = fakeAsync(async () => {
+      await setup();
       await router.navigate(['/login']);
       fixture.detectChanges();
 
@@ -168,7 +176,8 @@ describe('AppComponent', () => {
       expect(page).toBeTruthy();
     });
 
-    xit('hides Login and Sign Up from nav bar after successful login', async () => {
+    it('hides Login and Sign Up from nav bar after successful login', async () => {
+      await setupLogin();
       const loginLink = appComponent.querySelector(`a[title="Login"]`) as HTMLAnchorElement;
       const signUpLink = appComponent.querySelector(`a[title="Sign Up"]`) as HTMLAnchorElement;
       expect(loginLink).toBeFalsy();
@@ -188,7 +197,21 @@ describe('AppComponent', () => {
       const page = appComponent.querySelector(`[data-testid="user-page"]`);
       expect(myProfileLink).toBeTruthy();
       expect(location.path()).toEqual('/user/1');
+    });
 
+    it('stores logged in state in local storage', async () => {
+      await setupLogin();
+      const state = JSON.parse(localStorage.getItem('auth')!) as LoggedInUser;
+      expect(state.isLoggedIn).toBe(true);
+    });
+
+    it('displays layout of logged in user', async () => {
+      localStorage.setItem('auth', JSON.stringify({ isLoggedIn: true }))
+      await setup();
+      await router.navigate(['/']);
+      fixture.detectChanges();
+      const myProfileLink = appComponent.querySelector(`a[title="My Profile"]`) as HTMLAnchorElement;
+      expect(myProfileLink).toBeTruthy();
     });
   });
 });

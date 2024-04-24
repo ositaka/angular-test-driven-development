@@ -190,6 +190,12 @@ describe('AppComponent', () => {
       expect(myProfileLink).toBeTruthy();
     });
 
+    it('displays Logout link on nav bar after successful login', async () => {
+      await setupLogin();
+      const logoutLink = appComponent.querySelector(`span[title="Logout"]`) as HTMLAnchorElement;
+      expect(logoutLink).toBeTruthy();
+    });
+
     it('displays User Page with logged in user id in url after clicking My Profile link on nav bar', async () => {
       await setupLogin();
       const myProfileLink = appComponent.querySelector(`a[title="My Profile"]`) as HTMLAnchorElement;
@@ -212,6 +218,35 @@ describe('AppComponent', () => {
       fixture.detectChanges();
       const myProfileLink = appComponent.querySelector(`a[title="My Profile"]`) as HTMLAnchorElement;
       expect(myProfileLink).toBeTruthy();
+    });
+
+    it('displays Login and SIgn Up after clicking Logout', async () => {
+      await setupLogin();
+      const logoutLink = appComponent.querySelector(`span[title="Logout"]`) as HTMLSpanElement;
+      logoutLink.click();
+      fixture.detectChanges();
+      const loginLink = appComponent.querySelector(`a[title="Login"]`) as HTMLAnchorElement;
+      const signUpLink = appComponent.querySelector(`a[title="Sign Up"]`) as HTMLAnchorElement;
+      expect(loginLink).toBeTruthy();
+      expect(signUpLink).toBeTruthy();
+    });
+
+    it('clears storage after user logs out', async () => {
+      await setupLogin();
+      const logoutLink = appComponent.querySelector(`span[title="Logout"]`) as HTMLSpanElement;
+      logoutLink.click();
+      fixture.detectChanges();
+      const state = localStorage.getItem('auth');
+      expect(state).toBeNull();
+    });
+
+    it('send logout request to backend', async () => {
+      await setupLogin();
+      const logoutLink = appComponent.querySelector(`span[title="Logout"]`) as HTMLSpanElement;
+      logoutLink.click();
+      fixture.detectChanges();
+      const request = httpTestingController.expectOne('/api/1.0/logout');
+      expect(request).not.toBeNull();
     });
   });
 });

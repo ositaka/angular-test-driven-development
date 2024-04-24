@@ -7,11 +7,16 @@ import { AuthenticationService } from '../../core/authentication.service';
   standalone: true,
   imports: [RouterModule],
   templateUrl: './navbar.component.html',
-  styles: ``
+  styles: `span { cursor: pointer; }`
 })
 export class NavbarComponent {
 
-  constructor(readonly authenticationService: AuthenticationService) {
+  constructor(
+    readonly authenticationService: AuthenticationService) {
 
+  }
+
+  logout() {
+    this.authenticationService.logout();
   }
 }

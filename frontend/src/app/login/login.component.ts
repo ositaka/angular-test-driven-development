@@ -1,7 +1,6 @@
-import { Component, viewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { ButtonComponent } from '../shared/button/button.component';
 import { FormControl, FormsModule } from '@angular/forms';
-import { UserService } from '../core/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { CommonModule, JsonPipe } from '@angular/common';
@@ -26,7 +25,6 @@ export class LoginComponent {
   apiProgress = false;
 
   constructor(
-    private userService: UserService,
     private router: Router,
     private authenthciationService: AuthenticationService) { }
 
@@ -36,10 +34,9 @@ export class LoginComponent {
 
   onClickLogin() {
     this.apiProgress = true;
-    this.userService.autheticate(this.email, this.password).subscribe({
+    this.authenthciationService.autheticate(this.email, this.password).subscribe({
       next: (body) => {
         this.router.navigate(['/']);
-        this.authenthciationService.setLoggedInUser(body as User)
       },
       error: (err: HttpErrorResponse) => {
         this.error = err.error.message;
